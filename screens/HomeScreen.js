@@ -11,10 +11,12 @@ import {
   FlatList,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
+
 import axios from "axios";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [isCreationModalVisible, setIsCreationModalVisible] = useState(false);
   const [isJoiningModalVisible, setIsJoiningModalVisible] = useState(false);
@@ -22,11 +24,6 @@ export default function HomeScreen() {
   const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    { label: "SACCO 1", value: "sacco1" },
-    { label: "SACCO 2", value: "sacco2" },
-    { label: "SACCO 3", value: "sacco3" },
-  ]);
   const [saccos, setSaccos] = useState([]);
   const [newSaccoName, setNewSaccoName] = useState("");
   const [newSaccoDescription, setNewSaccoDescription] = useState("");
@@ -574,95 +571,101 @@ export default function HomeScreen() {
       <View style={{ flex: 1, width: "100%", marginTop: 20 }}>
         <Text style={{ fontSize: 30, fontWeight: "700" }}>Your SACCOs</Text>
         <FlatList
-          nestedScrollEnabled
           data={saccos}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
-            <View
-              style={{
-                flexDirection: "row", // Align content and delete button in a row
-                alignItems: "center", // Center content vertically
-                marginVertical: 10,
-                padding: 15,
-                borderRadius: 10,
-                backgroundColor: "#ffffff",
-                elevation: 5, // Adds shadow for Android
-                shadowColor: "#000", // Shadow for iOS
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 5,
-                borderWidth: 1,
-                borderColor: "#ddd",
-              }}
-            >
-              {/* SACCO Content */}
-              <View style={{ flex: 1 }}>
-                {/* SACCO Name */}
-                <Text
-                  style={{
-                    fontSize: 22,
-                    fontWeight: "bold",
-                    color: "#333",
-                    marginBottom: 5,
-                  }}
-                >
-                  {item.name}
-                </Text>
-
-                {/* SACCO Description */}
-                <Text style={{ fontSize: 16, color: "#555", marginBottom: 10 }}>
-                  {item.description}
-                </Text>
-
-                {/* Invite Members */}
-                <TouchableOpacity
-                  style={{
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    backgroundColor: "#4caf50",
-                    borderRadius: 5,
-                    alignSelf: "flex-start",
-                  }}
-                  onPress={() => setIsInviteModalVisible(true)}
-                >
-                  <Text style={{ color: "white", fontWeight: "600" }}>
-                    Invite Members
+            <TouchableOpacity onPress={() => navigation.navigate("SaccoMainScreen")}>
+              <View
+                style={{
+                  flexDirection: "row", // Align content and delete button in a row
+                  alignItems: "center", // Center content vertically
+                  marginVertical: 10,
+                  padding: 15,
+                  borderRadius: 10,
+                  backgroundColor: "#ffffff",
+                  elevation: 5, // Adds shadow for Android
+                  shadowColor: "#000", // Shadow for iOS
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 5,
+                  borderWidth: 1,
+                  borderColor: "#ddd",
+                }}
+              >
+                {/* SACCO Content */}
+                <View style={{ flex: 1 }}>
+                  {/* SACCO Name */}
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#333",
+                      marginBottom: 5,
+                    }}
+                  >
+                    {item.name}
                   </Text>
-                </TouchableOpacity>
 
-                {/* Roles or Members */}
-                <FlatList
-                  nestedScrollEnabled
-                  data={item.members}
-                  keyExtractor={(member, memberIndex) => memberIndex.toString()}
-                  renderItem={({ item: member }) => (
-                    <Text style={{ marginTop: 5, fontSize: 14, color: "#777" }}>
-                      {member.role}
+                  {/* SACCO Description */}
+                  <Text
+                    style={{ fontSize: 16, color: "#555", marginBottom: 10 }}
+                  >
+                    {item.description}
+                  </Text>
+
+                  {/* Invite Members */}
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      backgroundColor: "#4caf50",
+                      borderRadius: 5,
+                      alignSelf: "flex-start",
+                    }}
+                    onPress={() => setIsInviteModalVisible(true)}
+                  >
+                    <Text style={{ color: "white", fontWeight: "600" }}>
+                      Invite Members
                     </Text>
-                  )}
-                />
-              </View>
+                  </TouchableOpacity>
 
-              {/* Delete Button */}
-              {item.members.some((member) => member.role === "Chairman") && (
-                <TouchableOpacity
-                  onPress={() => deleteSacco(index)}
-                  style={{
-                    marginLeft: 10,
-                    padding: 10,
-                    backgroundColor: "#f44336",
-                    borderRadius: 25,
-                    elevation: 3,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 3,
-                  }}
-                >
-                  <Ionicons name="trash" size={20} color="white" />
-                </TouchableOpacity>
-              )}
-            </View>
+                  {/* Roles or Members */}
+                  <FlatList
+                    data={item.members}
+                    keyExtractor={(member, memberIndex) =>
+                      memberIndex.toString()
+                    }
+                    renderItem={({ item: member }) => (
+                      <Text
+                        style={{ marginTop: 5, fontSize: 14, color: "#777" }}
+                      >
+                        {member.role}
+                      </Text>
+                    )}
+                  />
+                </View>
+
+                {/* Delete Button */}
+                {item.members.some((member) => member.role === "Chairman") && (
+                  <TouchableOpacity
+                    onPress={() => deleteSacco(index)}
+                    style={{
+                      marginLeft: 10,
+                      padding: 10,
+                      backgroundColor: "#f44336",
+                      borderRadius: 25,
+                      elevation: 3,
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 3,
+                    }}
+                  >
+                    <Ionicons name="trash" size={20} color="white" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </TouchableOpacity>
           )}
         />
       </View>
